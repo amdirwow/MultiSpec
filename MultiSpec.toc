@@ -1,0 +1,5 @@
+## Interface: 30300
+## Title: MultiSpec
+## SavedVariablesPerCharacter: MultiSpecCharDB
+
+MultiSpec.lua
