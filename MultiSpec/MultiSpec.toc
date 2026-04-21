@@ -1,0 +1,6 @@
+## Interface: 30300
+## Title: MultiSpec
+## Author: Amdir
+## SavedVariablesPerCharacter: MultiSpecCharDB
+
+MultiSpec.lua
