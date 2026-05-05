@@ -8,6 +8,7 @@ local buttons = {}
 local initialized = false
 local layoutTicker = nil
 local currentTalentString = ""
+local waitingTalentExport = false
 
 local msSessionEnabled = false
 local msLoginPromptShown = false
@@ -282,12 +283,7 @@ end
 local pendingImport = nil  -- таблиця талантів для імпорту
 local importFrame = nil    -- фрейм для повторного застосування
 
-local function ShowExportPopup()
-    if currentTalentString == "" then
-        DEFAULT_CHAT_FRAME:AddMessage("|cffff0000MultiSpec:|r Немає даних талантів. Спочатку використайте /ms.")
-        return
-    end
-    
+local function OpenExportPopup()
     StaticPopupDialogs["MULTISPEC_EXPORT"] = {
         text = "Експорт талантів (Ctrl+C):",
         button1 = "Закрити",
@@ -304,6 +300,11 @@ local function ShowExportPopup()
         hideOnEscape = true,
     }
     StaticPopup_Show("MULTISPEC_EXPORT")
+end
+
+local function ShowExportPopup()
+    waitingTalentExport = true
+    RunCmd("spec talents")
 end
 
 local function StopImport()
@@ -762,6 +763,20 @@ local function ParseSystemMsg(rawMsg)
         if cdMs then
             switchCooldownMs = cdMs
             MS_Dbg("Cooldown set to", cdMs, "ms")
+        end
+        return
+    end
+
+    -- TALENTS|talentString
+    if msg:sub(1, 8) == "TALENTS|" then
+        currentTalentString = msg:sub(9) or ""
+        if waitingTalentExport then
+            waitingTalentExport = false
+            if currentTalentString == "" then
+                DEFAULT_CHAT_FRAME:AddMessage("|cffff0000MultiSpec:|r Не вдалося отримати дані талантів.")
+            else
+                OpenExportPopup()
+            end
         end
         return
     end
